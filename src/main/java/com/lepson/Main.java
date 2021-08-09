@@ -6,10 +6,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
-import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
@@ -17,13 +13,12 @@ import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
-public class Man {
+public class Main {
     public static void main(String[] args) {
 
+        //1. create Credentials and dynamoDB client
         AmazonDynamoDB amazonDynamoDBClient = AmazonDynamoDBClient.builder()
                 .withRegion(Regions.US_EAST_2)
                 .withCredentials(new AWSStaticCredentialsProvider(
@@ -31,16 +26,15 @@ public class Man {
                                 "")
                 )).build();
 
+        //2.Create table on DynamoDB site
+        createTable(amazonDynamoDBClient);
 
-
-        DynamoDB dynamoDB = new DynamoDB(amazonDynamoDBClient);
-
-//        createTable(dynamoDB);
-
+        //3. Get DynamoDBMapper instance
         DynamoDBMapper mapper = new DynamoDBMapper(amazonDynamoDBClient);
 
+//        4. Save item in DB
 //        ProductCatalogItem item = new ProductCatalogItem();
-//        item.setId("103");
+//        item.setId("102");
 //        item.setTitle("Book 102 Title");
 //        item.setISBN("222-2222222222");
 //        item.setBookAuthors(new HashSet<String>(Arrays.asList("Author 1", "Author 2")));
@@ -50,22 +44,14 @@ public class Man {
 //
 //        mapper.save(item);
 
+        //5. Load item from DB
         ProductCatalogItem load = mapper.load(ProductCatalogItem.class, "102");
 
         System.out.println(load);
 
-
-//
-//        List<String> tableNames = amazonDynamoDBClient.listTables().getTableNames();
-//        tableNames.forEach(System.out::println);
-//        DynamoDB dynamoDB = new DynamoDB(amazonDynamoDBClient);
-//        Table table = dynamoDB.getTable("users");
-//
-//        System.out.println(table.getItem(new PrimaryKey("id", "123")).toJSONPretty());
-
     }
 
-    private static void createTable(DynamoDB amazonDynamoDBClient) {
+    private static void createTable(AmazonDynamoDB amazonDynamoDBClient) {
 
         List<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
         attributeDefinitions.add(new AttributeDefinition().withAttributeName("Id").withAttributeType("S"));
@@ -75,7 +61,7 @@ public class Man {
 
         CreateTableRequest request = new CreateTableRequest().withTableName("ProductCatalog").withKeySchema(keySchema)
                 .withAttributeDefinitions(attributeDefinitions).withProvisionedThroughput(
-                        new ProvisionedThroughput(1L,1L)
+                        new ProvisionedThroughput(1L, 1L)
                 );
 
         amazonDynamoDBClient.createTable(request);

@@ -18,6 +18,7 @@ public class ProductCatalogItem {
     private Set<String> bookAuthors;
     private String someProp;
     private String name;
+    private Car car;
 
     @DynamoDBAttribute(attributeName="Name")
     public String getName() {
@@ -27,8 +28,6 @@ public class ProductCatalogItem {
     public void setName(String name) {
         this.name = name;
     }
-
-    private Car car;
 
     @DynamoDBHashKey(attributeName="Id")
     public String getId() { return id; }
